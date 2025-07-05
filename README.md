@@ -1,1 +1,59 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <title>Beziehungszähler</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <h1>💖 Beziehungszähler</h1>
+  <label>Beziehungsbeginn:
+    <input type="date" id="startDate">
+  </label>
+  <div id="output"></div>
+  <button id="notifyBtn">Erinnerung nach 100 Tagen</button>
+
+  <script src="script.js"></script>
+</body>
+</html>
+body { font-family: sans-serif; text-align: center; padding: 2rem; background:#fff0f5; }
+h1 { color: #c71585; }
+#output { margin: 1rem 0; font-size: 1.2rem; }
+button { padding: 0.5rem 1rem; background:#ff69b4; border:none; color:white; cursor:pointer; border-radius:4px; }
+const startInput = document.getElementById('startDate');
+const output = document.getElementById('output');
+const notifyBtn = document.getElementById('notifyBtn');
+
+function updateDisplay() {
+  if (!startInput.value) { output.textContent = 'Bitte Datum auswählen'; return; }
+  const start = new Date(startInput.value);
+  const now = new Date();
+  const diffDays = Math.floor((now - start) / (1000*60*60*24));
+  const months = Math.floor(diffDays / 30);
+  const weeks = Math.floor((diffDays % 30) / 7);
+  const days = diffDays % 7;
+  output.textContent = `Seit dem ${start.toLocaleDateString()}: ${months} Monate, ${weeks} Wochen und ${days} Tage`;
+}
+
+startInput.addEventListener('change', updateDisplay);
+
+notifyBtn.addEventListener('click', () => {
+  if (!('Notification' in window)) {
+    alert('Dein Browser unterstützt keine Notifications.');
+    return;
+  }
+  Notification.requestPermission().then(permission => {
+    if (permission === 'granted') {
+      const days = 100;
+      const start = new Date(startInput.value);
+      const notifyTime = start.getTime() + days * 24*60*60*1000;
+      const delay = notifyTime - Date.now();
+      if (delay <= 0) return alert('Dieser Zeitpunkt liegt in der Vergangenheit.');
+      setTimeout(() => {
+        new Notification(`100 Tage zusammen! 💕`);
+      }, delay);
+      alert('Erinnerung geplant!');
+    }
+  });
+});
 # Counter
